@@ -178,7 +178,7 @@ function setLastSeen(from, msg){
   User.findOne({'name': from}, function(err, person){
     if (err) throw err;
     if (person == null){
-      console.log("sorry I cant find that info");
+      console.log(from + " said " + msg);
     } else {
       person.last_seen = date;
       person.last_msg = msg;
@@ -529,11 +529,15 @@ function getFav(user, args){
 /* Find gif */
 /* -------- */
 function findGif(user, words){
-  words.shift();
-  var input = words.join("+");
-
   // API DOCS : https://github.com/giphy/GiphyAPI
   var url = "http://api.giphy.com/v1/gifs/random?api_key=dc6zaTOxFJmzC&tag=" + input;
+
+  if (words == undefined){
+    trendingGif(null);
+  } else {
+    words.shift();
+    var input = words.join("+");
+  }
 
   http.get(url, function(res){
     var body = '';
@@ -542,18 +546,13 @@ function findGif(user, words){
     });
     res.on('end', function(){
       var data = JSON.parse(body);
-
-      if (input == ""){
-        trendingGif(null);
+      if(data.data.image_url == undefined){
+        bot.say(config.channels[0], "Sorry, no results "+ user);
       } else {
-        if(data.data.image_url == undefined){
-          bot.say(config.channels[0], "Sorry, no results "+ user);
-        } else {
-          //tags below gifs
-          //var tags = data.data.tags.join(", ");
-          //bot.say(config.channels[0], tags);
-          bot.say(config.channels[0], user + " " + data.data.image_url);
-        }
+        //tags below gifs
+        //var tags = data.data.tags.join(", ");
+        //bot.say(config.channels[0], tags);
+        bot.say(config.channels[0], user + " " + data.data.image_url);
       }
     });
   });
