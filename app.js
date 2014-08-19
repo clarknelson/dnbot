@@ -222,7 +222,7 @@ bot.on("message", function(from, to, text, message) {
       setFav(from, input[1]);
     } else if(key == 'twitter'){
       twitter(from, input);
-    } else if(key == 'dribble'){
+    } else if(key == 'dribbble'){
       dribble(from, input);
     } else if(key == 'website'){
       website(from, input);
@@ -250,6 +250,8 @@ bot.on("message", function(from, to, text, message) {
       whoIs(from, input);
     } else if(key == 'seen'){
       lastSeen(from, input);
+    } else {
+      bot.say(config.channels[0], "Sorry I can not find the command !"+key);
     }
   }
   pingTheBot(input);
