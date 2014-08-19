@@ -143,9 +143,7 @@ function whoIs(user, args){
       if (person == null){
         bot.say(config.channels[0], "Sorry I can't find that user");
       } else {
-        bot.say(config.channels[0], person.name+"'s twitter account is "+person.social.twitter+", "+person.name+"'s dribble account is "+person.social.dribble+", and "+person.name+"'s personal website is "+person.social.website+".");
-        bot.say(config.channels[0], person.name+" has "+person.upvotes+" upvotes and "+person.downvotes + " downvotes resulting in "+ (person.upvotes - person.downvotes)+" karma.");
-        bot.say(config.channels[0], person.name+"'s favorite link is "+ person.favorite_link+ " and has " + person.quotes.length + " quotes.");
+        bot.say(config.channels[0], person.name+"'s twitter account is "+person.social.twitter+", "+person.name+"'s dribble account is "+person.social.dribble+", and "+person.name+"'s personal website is "+person.social.website+". "+ person.name+" has "+person.upvotes+" upvotes and "+person.downvotes + " downvotes resulting in "+ (person.upvotes - person.downvotes)+" karma. "+ person.name+"'s favorite link is "+ person.favorite_link+ " and has " + person.quotes.length + " quotes.");
       }
     });
   }
@@ -177,9 +175,7 @@ function setLastSeen(from, msg){
   var date = new Date();
   User.findOne({'name': from}, function(err, person){
     if (err) throw err;
-    if (person == null){
-      console.log(from + " said " + msg);
-    } else {
+    if (person =! null){
       person.last_seen = date;
       person.last_msg = msg;
       person.save();
@@ -378,9 +374,7 @@ function resetFeatures(){
 function aboutMe(user){
   User.findOne({'name': user}, function(err, person){
     if (err) throw err;
-    bot.say(config.channels[0], "Your twitter account is "+person.social.twitter+", your dribble account is "+person.social.dribble+", and your personal website is "+person.social.website+".");
-    bot.say(config.channels[0], "You have "+person.upvotes+" upvotes and "+person.downvotes + " downvotes resulting in "+ (person.upvotes - person.downvotes)+" karma.");
-    bot.say(config.channels[0], "Your favorite link is "+ person.favorite_link+ " and you have " + person.quotes.length + " quotes.");
+    bot.say(config.channels[0], "Your twitter account is "+person.social.twitter+", your dribble account is "+person.social.dribble+", and your personal website is "+person.social.website+". You have "+person.upvotes+" upvotes and "+person.downvotes + " downvotes resulting in "+ (person.upvotes - person.downvotes)+" karma.Your favorite link is "+ person.favorite_link+ " and you have " + person.quotes.length + " quotes.");
   });
 }
 /* ------------------- */
