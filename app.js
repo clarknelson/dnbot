@@ -83,6 +83,16 @@ var userSchema = mongoose.Schema({
 });
 var User = mongoose.model('User', userSchema);
 
+var forecast = new forecast({
+  service: 'forecast.io',
+  key: 'ec6d3faead4349452c196fe958924eac',
+  units: 'c',
+  cache: true,
+  ttl: {
+    minutes: 27,
+    seconds: 45
+  }
+});
 
 /* -------------- */
 /* Initialize bot */
@@ -660,16 +670,7 @@ function cleanUpHTML(foo){
 /* ------------ */
 /* Weather Code */
 /* ------------ */
-var forecast = new forecast({
-  service: 'forecast.io',
-  key: 'ec6d3faead4349452c196fe958924eac',
-  units: 'c',
-  cache: true,
-  ttl: {
-    minutes: 27,
-    seconds: 45
-  }
-});
+
 function getWeather(location){
   geocoder.geocode(location, function(err, res){
     if(err || res.results[0] == undefined){
