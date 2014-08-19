@@ -49,7 +49,7 @@ var irc = require('irc'),
     google = require('google');
 
 var config = {
-    channels: ["#DN"],
+    channels: ["#bottest"],
     server: "irc.freenode.net",
     botName: "DNbot"
 };
@@ -544,9 +544,7 @@ function findGif(user, words){
     });
 
     res.on('end', function(){
-
       var data = JSON.parse(body);
-      console.log(data);
       if(data.data.image_url == undefined){
         bot.say(config.channels[0], "Sorry, no results "+ user);
       } else {
@@ -572,11 +570,9 @@ function trendingGif(num){
     res.on('end', function(){
       var data = JSON.parse(body);
       if(num != undefined && num >= 0 && num < 100){
-        bot.say(config.channels[0], data.data[num].images.original.url);
-        bot.say(config.channels[0], "Trending gif #"+num+" Powered by Giphy.");
+        bot.say(config.channels[0], "Trending gif "+num+"/100 "+ data.data[num].images.original.url+" Powered by Giphy.");
       } else {
-        bot.say(config.channels[0], data.data[rand].images.original.url);
-        bot.say(config.channels[0], "Trending gif #"+rand+" Powered by Giphy");
+        bot.say(config.channels[0], "Trending gif "+rand+"/100 "+ data.data[rand].images.original.url+" Powered by Giphy.");
       }
     });
   });
