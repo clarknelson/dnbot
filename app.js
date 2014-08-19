@@ -32,6 +32,7 @@
 // 5. get real gif api key
 // 6. !twitter = your last tweet
 // 7. upvotes/downvotes
+// 8. remove undefined social elements
 //
 // DOING:
 //
@@ -52,6 +53,7 @@ var config = {
     server: "irc.freenode.net",
     botName: "DNbot"
 };
+
 
 
 /* ---------------------- */
@@ -83,16 +85,7 @@ var userSchema = mongoose.Schema({
 });
 var User = mongoose.model('User', userSchema);
 
-var forecast = new forecast({
-  service: 'forecast.io',
-  key: 'ec6d3faead4349452c196fe958924eac',
-  units: 'c',
-  cache: true,
-  ttl: {
-    minutes: 27,
-    seconds: 45
-  }
-});
+
 
 /* -------------- */
 /* Initialize bot */
@@ -109,6 +102,8 @@ bot.on('registered', function(){
   console.log("Welcome to freenode!");
   resetLogs();
 });
+
+
 
 /* -------------------------- */
 /* Check user for first visit */
@@ -134,56 +129,8 @@ bot.on('join#DN', function(nick, message){
   });
 });
 
-function whoIs(user, args){
-  if (args[1] == undefined){
-    aboutMe(user);
-  } else {
-    User.findOne({'name':args[1]}, function(err, person){
-      if (err) throw err;
-      if (person == null){
-        bot.say(config.channels[0], "Sorry I can't find that user");
-      } else {
-        bot.say(config.channels[0], person.name+"'s twitter account is "+person.social.twitter+", "+person.name+"'s dribble account is "+person.social.dribble+", and "+person.name+"'s personal website is "+person.social.website+". "+ person.name+" has "+person.upvotes+" upvotes and "+person.downvotes + " downvotes resulting in "+ (person.upvotes - person.downvotes)+" karma. "+ person.name+"'s favorite link is "+ person.favorite_link+ " and has " + person.quotes.length + " quotes.");
-      }
-    });
-  }
-}
 
-function lastSeen(from, args){
-  if(args[1]==undefined){
-    User.findOne({'name': from}, function(err, person){
-      if (err) throw err;
-      if (person == null){
-        bot.say(config.channels[0], "Sorry I can't find that user.");
-      } else {
-        bot.say(config.channels[0], person.name+" was last seen "+person.last_seen+" saying \""+person.last_msg+"\"");
-      }
-    });
-  } else {
-    User.findOne({'name': args[1]}, function(err, person){
-      if (err) throw err;
-      if (person == null){
-        bot.say(config.channels[0], "Sorry I can't find that user.");
-      } else {
-        bot.say(config.channels[0], person.name+" was last seen "+person.last_seen+" saying "+ person.last_msg);
-      }
-    });
-  }
-}
 
-function setLastSeen(from, msg){
-  var date = new Date();
-  User.findOne({'name': from}, function(err, person){
-    if (err) throw err;
-    if (person == null){
-      console.log("User not registered in database");
-    } else{
-      person.last_seen = date;
-      person.last_msg = msg;
-      person.save();
-    }
-  });
-}
 /* ------------- */
 /* Main function */
 /* ------------- */
@@ -337,6 +284,60 @@ function getGist(logs, file){
     console.log('problem with the request: ' + e.message);
   });
   req.end();
+}
+/* ----------------------------- */
+/* Sets the last_seen for a user */
+/* ----------------------------- */
+function lastSeen(from, args){
+  if(args[1]==undefined){
+    User.findOne({'name': from}, function(err, person){
+      if (err) throw err;
+      if (person == null){
+        bot.say(config.channels[0], "Sorry I can't find that user.");
+      } else {
+        bot.say(config.channels[0], person.name+" was last seen "+person.last_seen+" saying \""+person.last_msg+"\"");
+      }
+    });
+  } else {
+    User.findOne({'name': args[1]}, function(err, person){
+      if (err) throw err;
+      if (person == null){
+        bot.say(config.channels[0], "Sorry I can't find that user.");
+      } else {
+        bot.say(config.channels[0], person.name+" was last seen "+person.last_seen+" saying "+ person.last_msg);
+      }
+    });
+  }
+}
+function setLastSeen(from, msg){
+  var date = new Date();
+  User.findOne({'name': from}, function(err, person){
+    if (err) throw err;
+    if (person == null){
+      console.log("User not registered in database");
+    } else{
+      person.last_seen = date;
+      person.last_msg = msg;
+      person.save();
+    }
+  });
+}
+/* -------------------------------- */
+/* Returns information about a user */
+/* -------------------------------- */
+function whoIs(user, args){
+  if (args[1] == undefined){
+    aboutMe(user);
+  } else {
+    User.findOne({'name':args[1]}, function(err, person){
+      if (err) throw err;
+      if (person == null){
+        bot.say(config.channels[0], "Sorry I can't find that user");
+      } else {
+        bot.say(config.channels[0], person.name+"'s twitter account is "+person.social.twitter+", "+person.name+"'s dribble account is "+person.social.dribble+", and "+person.name+"'s personal website is "+person.social.website+". "+ person.name+" has "+person.upvotes+" upvotes and "+person.downvotes + " downvotes resulting in "+ (person.upvotes - person.downvotes)+" karma. "+ person.name+"'s favorite link is "+ person.favorite_link+ " and has " + person.quotes.length + " quotes.");
+      }
+    });
+  }
 }
 /* ---------------- */
 /* Feature requests */
@@ -525,8 +526,6 @@ function getFav(user, args){
 /* Find gif */
 /* -------- */
 function findGif(user, words){
-  // API DOCS : https://github.com/giphy/GiphyAPI
-  var url = "http://api.giphy.com/v1/gifs/random?api_key=dc6zaTOxFJmzC&tag=" + input;
 
   if (words == undefined){
     trendingGif(null);
@@ -535,20 +534,26 @@ function findGif(user, words){
     var input = words.join("+");
   }
 
+  // API DOCS : https://github.com/giphy/GiphyAPI
+  var url = "http://api.giphy.com/v1/gifs/random?api_key=dc6zaTOxFJmzC&tag=" + input;
+
   http.get(url, function(res){
     var body = '';
     res.on('data', function(chunk){
       body += chunk;
     });
+
     res.on('end', function(){
+
       var data = JSON.parse(body);
+      console.log(data);
       if(data.data.image_url == undefined){
         bot.say(config.channels[0], "Sorry, no results "+ user);
       } else {
         //tags below gifs
         //var tags = data.data.tags.join(", ");
         //bot.say(config.channels[0], tags);
-        bot.say(config.channels[0], user + " " + data.data.image_url);
+        bot.say(config.channels[0], user + " " + data.data.image_url + " Powered by Giphy");
       }
     });
   });
@@ -568,10 +573,10 @@ function trendingGif(num){
       var data = JSON.parse(body);
       if(num != undefined && num >= 0 && num < 100){
         bot.say(config.channels[0], data.data[num].images.original.url);
-        bot.say(config.channels[0], "Trending gif #"+num);
+        bot.say(config.channels[0], "Trending gif #"+num+" Powered by Giphy.");
       } else {
         bot.say(config.channels[0], data.data[rand].images.original.url);
-        bot.say(config.channels[0], "Trending gif #"+rand);
+        bot.say(config.channels[0], "Trending gif #"+rand+" Powered by Giphy");
       }
     });
   });
@@ -667,7 +672,16 @@ function cleanUpHTML(foo){
 /* ------------ */
 /* Weather Code */
 /* ------------ */
-
+var forecast = new forecast({
+  service: 'forecast.io',
+  key: 'ec6d3faead4349452c196fe958924eac',
+  units: 'c',
+  cache: true,
+  ttl: {
+    minutes: 27,
+    seconds: 45
+  }
+});
 function getWeather(location){
   geocoder.geocode(location, function(err, res){
     if(err || res.results[0] == undefined){
