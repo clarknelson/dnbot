@@ -211,9 +211,9 @@ bot.on("message", function(from, to, text, message) {
     } else if(key == 'choose'){
       choose(input);
     } else if(key == 'gifme'){
-      findGif(input);
+      findGif(from, input);
     } else if(key == 'gif'){
-      findGif(input);
+      findGif(from, input);
     } else if(key == 'trending'){
       trendingGif(input[1]);
     } else if(key == 'setfav'){
