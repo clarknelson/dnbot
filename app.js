@@ -526,7 +526,7 @@ function getFav(user, args){
 /* -------- */
 /* Find gif */
 /* -------- */
-function findGif(words){
+function findGif(user, words){
   words.shift();
   var input = words.join("+");
 
@@ -545,12 +545,12 @@ function findGif(words){
         trendingGif(null);
       } else {
         if(data.data.image_url == undefined){
-          bot.say(config.channels[0], "No results.");
+          bot.say(config.channels[0], "Sorry, no results "+ user);
         } else {
           //tags below gifs
           //var tags = data.data.tags.join(", ");
           //bot.say(config.channels[0], tags);
-          bot.say(config.channels[0], data.data.image_url);
+          bot.say(config.channels[0], user + " " + data.data.image_url);
         }
       }
     });
@@ -615,8 +615,8 @@ function getHelp(user){
   bot.say(user, "!weather <location> - get the weather for any location");
   bot.say(user, "!btc - get the current price of bitcoins in usd");
   bot.say(user, "!feature/features [request] - make a feature request or return the current list of feature requests");
-  bot.say(user, "!twitter/dribble/website add <url> - add your social information");
-  bot.say(user, "!twitter/dribble/website [user] - find out a user's social information");
+  bot.say(user, "!twitter/dribbble/website add <url> - add your social information");
+  bot.say(user, "!twitter/dribbble/website [user] - find out a user's social information");
   bot.say(user, "!social [user] - find out social information about a user");
   bot.say(user, "!choose <option1> <option2> ... - choose between several options");
   bot.say(user, "!gif/gifme [keyword] - Find a gif");
