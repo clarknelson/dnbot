@@ -175,7 +175,9 @@ function setLastSeen(from, msg){
   var date = new Date();
   User.findOne({'name': from}, function(err, person){
     if (err) throw err;
-    if (person =! null){
+    if (person == null){
+      console.log("User not registered in database");
+    } else{
       person.last_seen = date;
       person.last_msg = msg;
       person.save();
