@@ -131,6 +131,12 @@ bot.on('join#DN', function(nick, message){
 
 
 
+function eightBall(){
+  var answers = ['It is certain', 'It is decidedly so', 'Without a doubt', 'Yes definitely', 'You may rely on it', 'As I see it, yes', 'Most likely', 'Outlook good', 'Yes', 'Signs point to yes', 'Reply hazy try again', 'Ask again later', 'Better not tell you now', 'Cannot predict now', 'Concentrate and ask again', 'Don\'t count on it', 'My reply is no', 'My sources say no', 'Outlook not so good', 'Very doubtful'];
+
+  var key = Math.random();
+  console.log(key);
+}
 /* ------------- */
 /* Main function */
 /* ------------- */
@@ -195,11 +201,15 @@ bot.on("message", function(from, to, text, message) {
       whoIs(from, input);
     } else if(key == 'seen'){
       lastSeen(from, input);
+    } else if(key == '8ball'){
+      eightBall();
+    } else if(key == 'eightball'){
+      eightBall();
     } else {
       bot.say(config.channels[0], "Sorry I can not find the command !"+key);
     }
   }
-  pingTheBot(input);
+  //pingTheBot(input);
 });
 
 /* ------------------------- */
@@ -314,7 +324,7 @@ function setLastSeen(from, msg){
   User.findOne({'name': from}, function(err, person){
     if (err) throw err;
     if (person == null){
-      console.log("User not registered in database");
+      console.log(from+" not registered in database");
     } else{
       person.last_seen = date;
       person.last_msg = msg;
